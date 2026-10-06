@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>Socket.IO test</h1>
+  <script>
+    const socket = io("http://localhost:3000");
+    socket.on("connect", () => {
+      console.log("Connected! My id:", socket.id);
+    });
+
+    socket.on("note:created", (note) => {
+        console.log("New note received:", note);
+    })
+  </script>
+</body>
+</html>
