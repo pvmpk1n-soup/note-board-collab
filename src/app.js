@@ -1,9 +1,11 @@
 const express = require("express");
-const notesRouter = require("./routes/notes");
+const columnsRouter = require("./routes/columns");
+const cardsRouter = require("./routes/cards");
 
 const app = express();
 app.use(express.json());
 
-app.use("/notes", notesRouter);
+app.use("/columns", columnsRouter);
+app.use("/cards", cardsRouter);
 
 module.exports = app;
