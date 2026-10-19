@@ -1,56 +1,98 @@
 # Note Board Collab
 
-A real-time collaborative board app (kanban-style), built as a learning project
-to develop fullstack skills: Node.js/Express, PostgreSQL, Socket.IO, React, and Docker.
+![Board screenshot](docs/board.png)
 
-## Why this project
+A kanban-style board (columns and cards) built as a learning project to practice
+fullstack fundamentals: a REST API with Express and PostgreSQL, a React frontend,
+and real-time groundwork with Socket.IO.
 
-Built step by step while preparing for a backend/fullstack developer role focused on
-real-time communication systems. Each phase below was built, tested, and committed
-incrementally, see commit history for the full progression.
+Each step was built, tested, and committed incrementally, so the commit history
+shows how the project grew.
 
 ## Tech stack
 
 - **Backend:** Node.js, Express
 - **Database:** PostgreSQL (raw SQL via `pg`, parameterized queries)
-- **Real-time:** Socket.IO (WebSocket)
-- **Frontend:** React (in progress)
+- **Frontend:** React (Vite)
+- **Real-time:** Socket.IO (server set up, board events planned)
 - **Deployment:** Docker (planned)
+
+## Project structure
+
+```
+client/          React app (Vite)
+src/
+  routes/        columns.js, cards.js, board.js
+  app.js         Express setup (CORS, JSON parsing, routes)
+  server.js      HTTP server with Socket.IO attached
+  db.js          PostgreSQL connection pool
+db/schema.sql    Tables and seed columns
+docs/            Screenshots
+```
 
 ## Progress
 
-- [x] REST API (CRUD) with Express — routing, validation, proper status codes
-- [x] PostgreSQL integration — schema design, constraints, parameterized queries
-- [x] Real-time updates via Socket.IO — live broadcast on create/delete
-- [ ] Reframe data model: notes → columns + cards (kanban board)
-- [ ] React frontend
+- [x] REST API with Express: validation, proper status codes, parameterized queries
+- [x] PostgreSQL schema: columns and cards with a foreign key and cascade delete
+- [x] Data model reframed from notes to columns + cards
+- [x] `GET /board` returns every column with its cards in one response
+- [x] Socket.IO server set up and accepting connections
+- [x] React client that renders the board from the API
+- [ ] Add and delete cards from the UI (in progress)
+- [ ] Real-time board updates (broadcast card and column events to clients)
+- [ ] Drag and drop between columns (needs position renumbering)
 - [ ] Docker
 - [ ] Authentication
 - [ ] Deployment
 
 ## Running locally
 
+Requirements: Node.js and PostgreSQL.
+
 ```bash
-# install dependencies
+# 1. Install server dependencies
 npm install
 
-# set up PostgreSQL database (see src/db.js for connection config)
+# 2. Create the database and tables
 createdb noteboard
+psql noteboard -f db/schema.sql
 
-# start the server (auto-restarts on changes)
+# 3. Start the API (auto-restarts on changes)
 npx nodemon src/server.js
 ```
 
-Server runs on `http://localhost:3000`.
+The API runs on `http://localhost:3000`. The connection settings are in
+`src/db.js`; set the `user` there to match your local PostgreSQL user.
 
-## API endpoints (current)
+In a second terminal, start the React app:
 
-| Method | Endpoint      | Description          |
-|--------|---------------|-----------------------|
-| GET    | `/notes`      | List all notes        |
-| GET    | `/notes/:id`  | Get a single note     |
-| POST   | `/notes`      | Create a note         |
-| PUT    | `/notes/:id`  | Update a note         |
-| DELETE | `/notes/:id`  | Delete a note         |
+```bash
+cd client
+npm install
+npm run dev
+```
 
-WebSocket events: `note:created`, `note:deleted`, broadcast to all connected clients.
+The app runs on `http://localhost:5173`.
+
+## API endpoints
+
+| Method | Endpoint       | Description                                        |
+|--------|----------------|----------------------------------------------------|
+| GET    | `/board`       | All columns, each with its cards                   |
+| GET    | `/columns`     | List columns                                       |
+| POST   | `/columns`     | Create a column (`name`; position set by server)   |
+| PUT    | `/columns/:id` | Rename a column                                    |
+| DELETE | `/columns/:id` | Delete a column and its cards                      |
+| GET    | `/cards`       | List cards                                         |
+| GET    | `/cards/:id`   | Get one card                                       |
+| POST   | `/cards`       | Create a card (`column_id`, `title`, `content`)    |
+| PUT    | `/cards/:id`   | Update a card's title and content                  |
+| DELETE | `/cards/:id`   | Delete a card                                      |
+
+## Known limitations and next steps
+
+- No authentication; anyone who can reach the API can change the board.
+- Database connection settings are hardcoded in `src/db.js` (planned: environment variables).
+- Cards cannot be moved between columns yet, and positions are not renumbered after deletes.
+- Socket.IO connections work, but the board routes do not broadcast events yet.
+- No automated tests.
