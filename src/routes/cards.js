@@ -14,15 +14,15 @@ router.post("/", async (req, res) => {
 	}
 
 	try {
-		const countResult = await pool.query(
-			"SELECT COUNT(*) FROM cards WHERE column_id = $1",
-			[column_id],
+		const posResult = await pool.query(
+		"SELECT COALESCE(MAX(position), -1) + 1 AS next FROM cards WHERE column_id = $1",
+		[column_id]
 		);
-		const position = Number(countResult.rows[0].count);
+		const position = posResult.rows[0].next;
 
 		const result = await pool.query(
 			"INSERT INTO cards (column_id, title, content, position) VALUES ($1, $2, $3, $4) RETURNING *",
-			[column_id, title, content, position],
+			[column_id, title, content ?? "", position],
 		);
 
 		const newCard = result.rows[0];
