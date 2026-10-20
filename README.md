@@ -38,7 +38,7 @@ docs/            Screenshots
 - [x] `GET /board` returns every column with its cards in one response
 - [x] Socket.IO server set up and accepting connections
 - [x] React client that renders the board from the API
-- [ ] Add and delete cards from the UI (in progress)
+- [x] Add and delete cards from the UI
 - [ ] Real-time board updates (broadcast card and column events to clients)
 - [ ] Drag and drop between columns (needs position renumbering)
 - [ ] Docker
